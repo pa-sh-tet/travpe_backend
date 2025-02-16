@@ -31,6 +31,27 @@ export const getCurrentUser = async (req: AuthRequest, res: Response) => {
 	}
 };
 
+export const updateUser = async (req: AuthRequest, res: Response) => {
+	try {
+		if (!req.user || !req.user.id) {
+			res.status(401).json({ error: "Не аутентифицирован" });
+			return;
+		}
+
+		const { username, email, avatar } = req.body;
+
+		const user = await prisma.user.update({
+			where: { id: req.user.id },
+			data: { username, email, avatar }
+		});
+
+		res.json(user);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Ошибка сервера" });
+	}
+};
+
 export const getAllUsers = async (_: Request, res: Response) => {
 	try {
 		const users = await prisma.user.findMany();

@@ -1,4 +1,3 @@
-import { loginUser } from "./../../../travpe_next_tsx/src/redux/actions/authActions";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
@@ -22,8 +21,9 @@ export const register = async (req: Request, res: Response) => {
 			data: {
 				username,
 				email,
-				password: password
+				password: password,
 				// password: hashedPassword
+				avatar: "https://olira174.ru/wp-content/uploads/2019/12/no_avatar.jpg"
 			}
 		});
 		res.json({ message: "Пользователь успешно зарегистрирован", user });
@@ -70,7 +70,7 @@ export const login = async (req: Request, res: Response) => {
 		const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
 			expiresIn: "1d"
 		});
-		
+
 		console.log("Авторизация успешна");
 		res.json({ message: "Авторизация успешна", token, user });
 		return;
