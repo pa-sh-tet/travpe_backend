@@ -12,7 +12,7 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
-  avatar    String?
+  avatar    String?  
   createdAt DateTime @default(now())
   posts     Post[]
   likes     Like[]
@@ -25,6 +25,7 @@ model Post {
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
   likes     Like[]
+  location  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
