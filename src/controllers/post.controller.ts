@@ -28,11 +28,38 @@ export const createPost = async (req: Request, res: Response) => {
 
 export const getPosts = async (req: Request, res: Response) => {
 	try {
-		const posts = await prisma.post.findMany();
+		const posts = await prisma.post.findMany({
+			include: {
+				user: {
+					select: {
+						id: true,
+						username: true,
+						avatar: true
+					}
+				}
+			},
+			orderBy: { createdAt: "desc" }
+		});
 		res.json(posts);
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: "Ошибка при получении постов" });
+	}
+};
+
+export const getAllUserPosts = async (req: Request, res: Response) => {
+	const { userId } = req.params;
+
+	try {
+		const posts = await prisma.post.findMany({
+			where: { userId: Number(userId) },
+			orderBy: { createdAt: "desc" }
+		});
+
+		res.json(posts);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: "Ошибка при получении постов пользователя" });
 	}
 };
 
