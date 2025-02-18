@@ -24,17 +24,19 @@ export const likePost = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Ошибка при добавлении лайка" });
 	}
 };
-
 export const getLikesByPost = async (req: Request, res: Response) => {
-	const { postId } = req.body;
+	console.log("req.params:", req.params);
+	const { postId } = req.params;
 
 	if (!postId) {
-		res.status(400).json({ error: "Все поля обязательны" });
+		res.status(400).json({ error: "Не указан postId" });
 		return;
 	}
 
 	try {
-		const likes = await prisma.like.findMany({ where: { postId } });
+		const likes = await prisma.like.findMany({
+			where: { postId: Number(postId) }
+		}); // 🔢 Преобразуем postId в число
 		res.json(likes);
 	} catch (error) {
 		console.error(error);
@@ -49,6 +51,7 @@ export const unlikePost = async (req: Request, res: Response) => {
 		await prisma.like.delete({
 			where: { id: Number(id) }
 		});
+		res.json({ message: "Лайк успешно удален" });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ error: "Ошибка при удалении лайка" });
