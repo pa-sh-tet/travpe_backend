@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 // Маршрут для регистрации пользователя
 export const register = async (req: Request, res: Response) => {
-	const { username, email, password } = req.body;
+	const { username, email, password, avatar } = req.body;
 
 	// Ввел ли пользователь все данные
 	if (!username || !email || !password) {
@@ -15,19 +16,27 @@ export const register = async (req: Request, res: Response) => {
 	}
 
 	try {
-		// const hashedPassword = await bcrypt.hash(password, 10); // захэшировать пароль
+		const hashedPassword = await bcrypt.hash(password, 10); // хэшируем пароль
 
 		const user = await prisma.user.create({
 			data: {
 				username,
 				email,
-				password: password,
-				// password: hashedPassword
-				avatar: "https://olira174.ru/wp-content/uploads/2019/12/no_avatar.jpg"
+				// password: password,
+				password: hashedPassword,
+				avatar:
+					avatar ||
+					"https://olira174.ru/wp-content/uploads/2019/12/no_avatar.jpg"
 			}
 		});
-		res.json({ message: "Пользователь успешно зарегистрирован", user });
-	} catch (error) {
+		res
+			.status(201)
+			.json({ message: "Пользователь успешно зарегистрирован", user });
+	} catch (error: any) {
+		if (error.code === "P2002") {
+			res.status(409).json({ error: "Этот email уже зарегистрирован" });
+			return;
+		}
 		console.error(error);
 		res.status(500).json({ error: "Ошибка при регистрации пользователя" });
 	}
@@ -56,9 +65,8 @@ export const login = async (req: Request, res: Response) => {
 			return;
 		}
 
-		console.log({ email, password });
-		const isPasswordValid = password === user.password;
-		// const isPasswordValid = await bcrypt.compare(password, user.password);
+		// const isPasswordValid = password === user.password;
+		const isPasswordValid = await bcrypt.compare(password, user.password);
 
 		// Смотрим корректен ли пароль
 		if (!isPasswordValid) {

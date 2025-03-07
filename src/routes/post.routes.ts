@@ -7,12 +7,13 @@ import {
 	updatePost,
 	deletePost
 } from "../controllers/post.controller";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 export const postRouter = Router();
 
-postRouter.post("/", createPost);
+postRouter.post("/", authenticateToken, createPost);
 postRouter.get("/", getPosts);
-postRouter.get("/user/:userId", getAllUserPosts);
+postRouter.get("/user/:userId", authenticateToken, getAllUserPosts);
 postRouter.get("/:id", getPostById);
-postRouter.put("/:id", updatePost);
-postRouter.delete("/:id", deletePost);
+postRouter.put("/:id", authenticateToken, updatePost);
+postRouter.delete("/:id", authenticateToken, deletePost);

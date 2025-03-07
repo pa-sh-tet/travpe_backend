@@ -22,7 +22,6 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
-// API маршруты
 app.use("/auth", authRouter);
 app.use("/posts", postRouter);
 app.use("/users", userRouter);
