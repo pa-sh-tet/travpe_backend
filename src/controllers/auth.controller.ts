@@ -34,10 +34,9 @@ export const register = async (req: Request, res: Response) => {
 			.json({ message: "Пользователь успешно зарегистрирован", user });
 	} catch (error: any) {
 		if (error.code === "P2002") {
-			res.status(409).json({ error: "Этот email уже зарегистрирован" });
+			res.status(409).json({ error: "This email has already been registered" });
 			return;
 		}
-		console.error(error);
 		res.status(500).json({ error: "Ошибка при регистрации пользователя" });
 	}
 };
@@ -70,7 +69,7 @@ export const login = async (req: Request, res: Response) => {
 
 		// Смотрим корректен ли пароль
 		if (!isPasswordValid) {
-			res.status(401).json({ error: "Неверный пароль" });
+			res.status(401).json({ error: "Incorrect password" });
 			return;
 		}
 

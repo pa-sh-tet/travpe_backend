@@ -74,3 +74,38 @@ export const getUserById = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Ошибка получения пользователя" });
 	}
 };
+
+export const checkUsernameAvailability = async (
+	req: Request,
+	res: Response
+) => {
+	const { username } = req.body;
+	try {
+		const user = await prisma.user.findUnique({ where: { username } });
+		if (user) {
+			res.json(false);
+		} else {
+			res.json(true);
+		}
+	} catch (error) {
+		res
+			.status(500)
+			.json({ error: "Ошибка проверки доступности имени пользователя" });
+	}
+};
+
+export const checkEmailAvailability = async (req: Request, res: Response) => {
+	const { email } = req.body;
+	try {
+		const user = await prisma.user.findUnique({ where: { email } });
+		if (user) {
+			res.json(false);
+		} else {
+			res.json(true);
+		}
+	} catch (error) {
+		res
+			.status(500)
+			.json({ error: "Ошибка проверки доступности имени пользователя" });
+	}
+};

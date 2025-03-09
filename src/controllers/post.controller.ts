@@ -86,12 +86,14 @@ export const updatePost = async (req: Request, res: Response) => {
 	const { content, image } = req.body;
 
 	try {
+		const updatedData: any = {};
+		if (content !== undefined) updatedData.content = content;
+		if (image !== undefined) updatedData.image = image;
+
 		const post = await prisma.post.update({
 			where: { id: Number(id) },
-			data: {
-				content,
-				image
-			}
+			data: updatedData,
+			include: { user: true }
 		});
 
 		res.json(post);
@@ -100,6 +102,26 @@ export const updatePost = async (req: Request, res: Response) => {
 		res.status(500).json({ error: "Ошибка при редактировании поста" });
 	}
 };
+
+// export const updatePost = async (req: Request, res: Response) => {
+// 	const { id } = req.params;
+// 	const { content, image } = req.body;
+
+// 	try {
+// 		const post = await prisma.post.update({
+// 			where: { id: Number(id) },
+// 			data: {
+// 				content,
+// 				image
+// 			}
+// 		});
+
+// 		res.json(post);
+// 	} catch (error) {
+// 		console.error(error);
+// 		res.status(500).json({ error: "Ошибка при редактировании поста" });
+// 	}
+// };
 
 export const deletePost = async (req: Request, res: Response) => {
 	const { id } = req.params;

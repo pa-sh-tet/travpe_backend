@@ -3,8 +3,6 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
-// TODO допилить хэширование
-// import bcrypt from "bcrypt";
 
 import { authRouter } from "./routes/auth.routes";
 import { postRouter } from "./routes/post.routes";
@@ -22,10 +20,10 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
-app.use("/auth", authRouter);
-app.use("/posts", postRouter);
-app.use("/users", userRouter);
-app.use("/likes", likeRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/posts", postRouter);
+app.use("/api/users", userRouter);
+app.use("/api/likes", likeRouter);
 
 app.listen(PORT, () => {
 	console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
