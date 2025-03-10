@@ -42,7 +42,13 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
 
 		const user = await prisma.user.update({
 			where: { id: req.user.id },
-			data: { username, email, avatar }
+			data: {
+				username,
+				email,
+				avatar:
+					avatar ||
+					"https://olira174.ru/wp-content/uploads/2019/12/no_avatar.jpg"
+			}
 		});
 
 		res.json(user);
@@ -82,15 +88,9 @@ export const checkUsernameAvailability = async (
 	const { username } = req.body;
 	try {
 		const user = await prisma.user.findUnique({ where: { username } });
-		if (user) {
-			res.json(false);
-		} else {
-			res.json(true);
-		}
+		res.json({ available: !user });
 	} catch (error) {
-		res
-			.status(500)
-			.json({ error: "Ошибка проверки доступности имени пользователя" });
+		res.status(500).json({ error: "Ошибка проверки имени пользователя" });
 	}
 };
 
@@ -98,14 +98,8 @@ export const checkEmailAvailability = async (req: Request, res: Response) => {
 	const { email } = req.body;
 	try {
 		const user = await prisma.user.findUnique({ where: { email } });
-		if (user) {
-			res.json(false);
-		} else {
-			res.json(true);
-		}
+		res.json({ available: !user });
 	} catch (error) {
-		res
-			.status(500)
-			.json({ error: "Ошибка проверки доступности имени пользователя" });
+		res.status(500).json({ error: "Ошибка проверки email" });
 	}
 };
