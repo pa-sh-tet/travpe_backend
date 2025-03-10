@@ -6,7 +6,8 @@
 		"test": "jest --coverage",
 		"dev": "nodemon src/app.ts",
 		"build": "tsc",
-		"start": "node dist/app.js"
+		"start": "node dist/app.js",
+		"postinstall": "tsc"
 	},
 	"keywords": [],
 	"author": "",
