@@ -7,7 +7,7 @@
 		"dev": "nodemon src/app.ts",
 		"build": "tsc",
 		"start": "node dist/app.js",
-		"postinstall": "tsc"
+		"postinstall": "npm run build"
 	},
 	"keywords": [],
 	"author": "",
