@@ -5,8 +5,22 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-// Маршрут для регистрации пользователя
-export const register = async (req: Request, res: Response) => {
+interface RegisterRequestBody {
+	username: string;
+	email: string;
+	password: string;
+	avatar?: string;
+}
+
+interface LoginRequestBody {
+	email: string;
+	password: string;
+}
+
+export const register = async (
+	req: Request<{}, {}, RegisterRequestBody>,
+	res: Response
+) => {
 	const { username, email, password, avatar } = req.body;
 
 	// Ввел ли пользователь все данные
@@ -16,13 +30,12 @@ export const register = async (req: Request, res: Response) => {
 	}
 
 	try {
-		const hashedPassword = await bcrypt.hash(password, 10); // хэшируем пароль
+		const hashedPassword = await bcrypt.hash(password, 10);
 
 		const user = await prisma.user.create({
 			data: {
 				username,
 				email,
-				// password: password,
 				password: hashedPassword,
 				avatar:
 					avatar ||
@@ -41,8 +54,10 @@ export const register = async (req: Request, res: Response) => {
 	}
 };
 
-// Маршрут для авторизации пользователя
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+	req: Request<{}, {}, LoginRequestBody>,
+	res: Response
+) => {
 	const { email, password } = req.body;
 
 	// Ввел ли пользователь все данные
@@ -64,7 +79,6 @@ export const login = async (req: Request, res: Response) => {
 			return;
 		}
 
-		// const isPasswordValid = password === user.password;
 		const isPasswordValid = await bcrypt.compare(password, user.password);
 
 		// Смотрим корректен ли пароль
@@ -73,7 +87,6 @@ export const login = async (req: Request, res: Response) => {
 			return;
 		}
 
-		// Создание
 		const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
 			expiresIn: "1d"
 		});

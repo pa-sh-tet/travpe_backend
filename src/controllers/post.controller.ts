@@ -3,8 +3,23 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createPost = async (req: Request, res: Response) => {
+interface CreatePostBody {
+	content: string;
+	image: string;
+	userId: number;
+}
+
+export const createPost = async (
+	req: Request<{}, {}, CreatePostBody>,
+	res: Response
+) => {
 	const { content, image, userId } = req.body;
+
+	const userIdNumber = Number(userId);
+	if (!userIdNumber) {
+		res.status(400).json({ error: "Некорректный userId" });
+		return;
+	}
 
 	if (!content || !image || !userId) {
 		res.status(400).json({ error: "Все поля обязательны" });
@@ -47,7 +62,10 @@ export const getPosts = async (req: Request, res: Response) => {
 	}
 };
 
-export const getAllUserPosts = async (req: Request, res: Response) => {
+export const getAllUserPosts = async (
+	req: Request<{ userId: string }>,
+	res: Response
+) => {
 	const { userId } = req.params;
 
 	try {
@@ -63,7 +81,10 @@ export const getAllUserPosts = async (req: Request, res: Response) => {
 	}
 };
 
-export const getPostById = async (req: Request, res: Response) => {
+export const getPostById = async (
+	req: Request<{ id: string }>,
+	res: Response
+) => {
 	const { id } = req.params;
 
 	try {
@@ -81,12 +102,16 @@ export const getPostById = async (req: Request, res: Response) => {
 	}
 };
 
-export const updatePost = async (req: Request, res: Response) => {
+export const updatePost = async (
+	// первый {} - это req.params(из URL), второй {} - это req.query , третий {} - это req.body
+	req: Request<{ id: string }, {}, { content?: string; image?: string }>,
+	res: Response
+) => {
 	const { id } = req.params;
 	const { content, image } = req.body;
 
 	try {
-		const updatedData: any = {};
+		const updatedData: { content?: string; image?: string } = {};
 		if (content !== undefined) updatedData.content = content;
 		if (image !== undefined) updatedData.image = image;
 
@@ -103,27 +128,10 @@ export const updatePost = async (req: Request, res: Response) => {
 	}
 };
 
-// export const updatePost = async (req: Request, res: Response) => {
-// 	const { id } = req.params;
-// 	const { content, image } = req.body;
-
-// 	try {
-// 		const post = await prisma.post.update({
-// 			where: { id: Number(id) },
-// 			data: {
-// 				content,
-// 				image
-// 			}
-// 		});
-
-// 		res.json(post);
-// 	} catch (error) {
-// 		console.error(error);
-// 		res.status(500).json({ error: "Ошибка при редактировании поста" });
-// 	}
-// };
-
-export const deletePost = async (req: Request, res: Response) => {
+export const deletePost = async (
+	req: Request<{ id: string }>,
+	res: Response
+) => {
 	const { id } = req.params;
 
 	try {

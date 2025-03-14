@@ -3,13 +3,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+interface UserPayload {
+	id: number;
+}
+
 interface AuthRequest extends Request {
-	user?: { id: number };
+	user?: UserPayload;
 }
 
 export const getCurrentUser = async (req: AuthRequest, res: Response) => {
 	try {
-		if (!req.user || !req.user.id) {
+		if (!req.user?.id) {
 			res.status(401).json({ error: "Не аутентифицирован" });
 			return;
 		}
@@ -33,12 +37,17 @@ export const getCurrentUser = async (req: AuthRequest, res: Response) => {
 
 export const updateUser = async (req: AuthRequest, res: Response) => {
 	try {
-		if (!req.user || !req.user.id) {
+		if (!req.user?.id) {
 			res.status(401).json({ error: "Не аутентифицирован" });
 			return;
 		}
 
 		const { username, email, avatar } = req.body;
+
+		if (!username && !email && !avatar) {
+			res.status(400).json({ error: "Нет данных для обновления" });
+			return;
+		}
 
 		const user = await prisma.user.update({
 			where: { id: req.user.id },
@@ -60,17 +69,25 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
 
 export const getAllUsers = async (_: Request, res: Response) => {
 	try {
-		const users = await prisma.user.findMany();
+		const users = await prisma.user.findMany({
+			select: { id: true, username: true, avatar: true }
+		});
 		res.json(users);
 	} catch (error) {
 		res.status(500).json({ error: "Ошибка получения пользователей" });
 	}
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+	req: Request<{ id: string }>,
+	res: Response
+) => {
 	const { id } = req.params;
 	try {
-		const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+		const user = await prisma.user.findUnique({
+			where: { id: Number(id) },
+			select: { id: true, username: true, avatar: true }
+		});
 		if (!user) {
 			res.status(404).json({ error: "Пользователь не найден" });
 			return;
@@ -82,7 +99,7 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const checkUsernameAvailability = async (
-	req: Request,
+	req: Request<{ username: string }>,
 	res: Response
 ) => {
 	const { username } = req.body;
@@ -94,7 +111,10 @@ export const checkUsernameAvailability = async (
 	}
 };
 
-export const checkEmailAvailability = async (req: Request, res: Response) => {
+export const checkEmailAvailability = async (
+	req: Request<{ email: string }>,
+	res: Response
+) => {
 	const { email } = req.body;
 	try {
 		const user = await prisma.user.findUnique({ where: { email } });
