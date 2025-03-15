@@ -91,7 +91,6 @@ export const login = async (
 			expiresIn: "1d"
 		});
 
-		console.log("Авторизация успешна");
 		res.json({ message: "Авторизация успешна", token, user });
 		return;
 	} catch (error) {

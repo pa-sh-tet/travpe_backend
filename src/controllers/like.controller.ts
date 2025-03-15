@@ -29,12 +29,7 @@ export const likePost = async (
 				}
 			}
 		});
-		// const existingLike = await prisma.like.findFirst({
-		// 	where: {
-		// 			userId: userId,
-		// 			postId: postId
-		// 	}
-		// });
+		
 		if (existingLike) {
 			res.status(400).json({ error: "Лайк уже поставлен" });
 			return;
