@@ -42,9 +42,18 @@ export const register = async (
 					"https://olira174.ru/wp-content/uploads/2019/12/no_avatar.jpg"
 			}
 		});
-		res
-			.status(201)
-			.json({ message: "Пользователь успешно зарегистрирован", user });
+
+		const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+			expiresIn: "1d"
+		});
+
+		res.status(201).json({
+			message:
+				"Пользователь успешно зарегистрирован. Авторизация прошла успешно",
+			token,
+			user
+		});
+		return;
 	} catch (error: any) {
 		if (error.code === "P2002") {
 			res.status(409).json({ error: "This email has already been registered" });

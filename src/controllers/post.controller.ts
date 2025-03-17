@@ -88,7 +88,18 @@ export const getPostById = async (
 	const { id } = req.params;
 
 	try {
-		const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+		const post = await prisma.post.findUnique({
+			include: {
+				user: {
+					select: {
+						id: true,
+						username: true,
+						avatar: true
+					}
+				}
+			},
+			where: { id: Number(id) }
+		});
 
 		if (!post) {
 			res.status(404).json({ error: "Пост не найден" });
