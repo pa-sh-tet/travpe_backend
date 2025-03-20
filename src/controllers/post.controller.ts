@@ -7,13 +7,16 @@ interface CreatePostBody {
 	content: string;
 	image: string;
 	userId: number;
+	location: string;
+	latitude: number;
+	longitude: number;
 }
 
 export const createPost = async (
 	req: Request<{}, {}, CreatePostBody>,
 	res: Response
 ) => {
-	const { content, image, userId } = req.body;
+	const { content, image, userId, location, latitude, longitude } = req.body;
 
 	const userIdNumber = Number(userId);
 	if (!userIdNumber) {
@@ -21,7 +24,7 @@ export const createPost = async (
 		return;
 	}
 
-	if (!content || !image || !userId) {
+	if (!content || !image || !userId || !location || !latitude || !longitude) {
 		res.status(400).json({ error: "Все поля обязательны" });
 		return;
 	}
@@ -31,7 +34,10 @@ export const createPost = async (
 			data: {
 				content,
 				image,
-				userId
+				userId,
+				location,
+				latitude,
+				longitude
 			}
 		});
 		res.json({ message: "Пост успешно создан", post });
@@ -115,16 +121,35 @@ export const getPostById = async (
 
 export const updatePost = async (
 	// первый {} - это req.params(из URL), второй {} - это req.query , третий {} - это req.body
-	req: Request<{ id: string }, {}, { content?: string; image?: string }>,
+	req: Request<
+		{ id: string },
+		{},
+		{
+			content?: string;
+			image?: string;
+			location?: string;
+			latitude?: number;
+			longitude?: number;
+		}
+	>,
 	res: Response
 ) => {
 	const { id } = req.params;
-	const { content, image } = req.body;
+	const { content, image, location, latitude, longitude } = req.body;
 
 	try {
-		const updatedData: { content?: string; image?: string } = {};
+		const updatedData: {
+			content?: string;
+			image?: string;
+			location?: string;
+			latitude?: number;
+			longitude?: number;
+		} = {};
 		if (content !== undefined) updatedData.content = content;
 		if (image !== undefined) updatedData.image = image;
+		if (location !== undefined) updatedData.location = location;
+		if (latitude !== undefined) updatedData.latitude = latitude;
+		if (longitude !== undefined) updatedData.longitude = longitude;
 
 		const post = await prisma.post.update({
 			where: { id: Number(id) },
