@@ -5,7 +5,8 @@ import {
 	getAllUserPosts,
 	getPostById,
 	updatePost,
-	deletePost
+	deletePost,
+	getTopLocations
 } from "../controllers/post.controller";
 import { authenticateToken } from "../middleware/auth.middleware";
 
@@ -17,3 +18,4 @@ postRouter.get("/user/:userId", authenticateToken, getAllUserPosts);
 postRouter.get("/:id", getPostById);
 postRouter.patch("/:id", authenticateToken, updatePost);
 postRouter.delete("/:id", authenticateToken, deletePost);
+postRouter.get("/locations/top-locations", getTopLocations);
