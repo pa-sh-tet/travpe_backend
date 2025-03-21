@@ -86,7 +86,7 @@ export const getUserById = async (
 	try {
 		const user = await prisma.user.findUnique({
 			where: { id: Number(id) },
-			select: { id: true, username: true, avatar: true }
+			select: { id: true, username: true, avatar: true, email: true }
 		});
 		if (!user) {
 			res.status(404).json({ error: "Пользователь не найден" });
