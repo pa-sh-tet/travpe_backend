@@ -239,7 +239,12 @@ export const getTopLocations = async (req: Request, res: Response) => {
 		const sortedLocations = Object.entries(groupedLocations)
 			.sort((a, b) => b[1].count - a[1].count)
 			.slice(0, 5)
-			.map(([location, { count }]) => ({ location, count }));
+			.map(([location, { count, lat, lon }]) => ({
+				location,
+				count,
+				latitude: lat,
+				longitude: lon
+			}));
 
 		res.json(sortedLocations);
 	} catch (error) {
