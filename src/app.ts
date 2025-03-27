@@ -20,6 +20,10 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 
+app.get("/ping", (req, res) => {
+	res.status(200).send("OK");
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/users", userRouter);
