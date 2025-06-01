@@ -8,6 +8,7 @@ import { authRouter } from "./routes/auth.routes";
 import { postRouter } from "./routes/post.routes";
 import { userRouter } from "./routes/user.routes";
 import { likeRouter } from "./routes/like.routes";
+import { gptRouter } from "./routes/gpt.routes";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/users", userRouter);
 app.use("/api/likes", likeRouter);
+app.use("/api/gpt", gptRouter);
 
 app.listen(PORT, () => {
 	console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
