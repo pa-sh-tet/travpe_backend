@@ -10,6 +10,7 @@ import { userRouter } from "./routes/user.routes";
 import { likeRouter } from "./routes/like.routes";
 import { gptRouter } from "./routes/gpt.routes";
 import { commentRouter } from "./routes/comment.routes";
+import { adminRouter } from "./routes/admin.routes";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/users", userRouter);
 app.use("/api/likes", likeRouter);
 app.use("/api/gpt", gptRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/admin", adminRouter);
 
 app.listen(PORT, () => {
 	console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);

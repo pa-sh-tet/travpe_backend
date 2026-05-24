@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { prisma } from "../utils/prisma";
 
 interface AuthRequest extends Request {
 	user?: { id: number };
 }
 
-export const authenticateToken = (
+export const authenticateToken = async (
 	req: AuthRequest,
 	res: Response,
 	next: NextFunction
@@ -21,6 +22,21 @@ export const authenticateToken = (
 		const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
 			userId: number;
 		};
+
+		const user = await prisma.user.findUnique({
+			where: { id: decoded.userId },
+			select: { id: true, isBlocked: true }
+		});
+
+		if (!user) {
+			res.status(403).json({ error: "Пользователь не найден" });
+			return;
+		}
+
+		if (user.isBlocked) {
+			res.status(403).json({ error: "Ваш аккаунт заблокирован" });
+			return;
+		}
 
 		req.user = { id: decoded.userId };
 		next();
