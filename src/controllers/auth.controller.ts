@@ -113,15 +113,15 @@ export const yandexLogin = (_req: Request, res: Response) => {
 	const params = new URLSearchParams({
 		response_type: "code",
 		client_id: process.env.YANDEX_CLIENT_ID!,
-		redirect_uri: `${process.env.BACKEND_URL || "http://localhost:5000"}/api/auth/yandex/callback`
+		redirect_uri: `${process.env.BACKEND_URL}/api/auth/yandex/callback`
 	});
 	res.redirect(`https://oauth.yandex.ru/authorize?${params}`);
 };
 
 export const yandexCallback = async (req: Request, res: Response) => {
 	const { code } = req.query;
-	const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-	const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+	const frontendUrl = process.env.FRONTEND_URL;
+	const backendUrl = process.env.BACKEND_URL;
 
 	if (!code) {
 		res.redirect(`${frontendUrl}/login?error=oauth_failed`);
@@ -212,7 +212,10 @@ export const yandexCallback = async (req: Request, res: Response) => {
 
 		res.redirect(`${frontendUrl}/oauth-callback?token=${token}`);
 	} catch (error: any) {
-		console.error("Yandex OAuth error:", error?.response?.data ?? error.message);
+		console.error(
+			"Yandex OAuth error:",
+			error?.response?.data ?? error.message
+		);
 		res.redirect(`${frontendUrl}/login?error=oauth_failed`);
 	}
 };
