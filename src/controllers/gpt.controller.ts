@@ -33,6 +33,66 @@ async function getAccessToken() {
 	return token;
 }
 
+export const suggestPersonalizedPlace = async (req: any, res: any) => {
+	try {
+		const { locations }: { locations?: string[] } = req.body;
+		const accessToken = await getAccessToken();
+
+		const hasLocations = Array.isArray(locations) && locations.length > 0;
+		const locationList = hasLocations ? locations.join(", ") : null;
+
+		const prompt = hasLocations
+			? `Пользователь уже побывал в следующих местах России: ${locationList}.
+			   Предложи следующее интересное место для посещения, которое он ещё не видел. Нужно что-то оригинальное.
+
+				Нужен короткий ответ для карточки на сайте.
+
+				Требования:
+				- без markdown
+				- без звёздочек
+				- без списков
+				- без длинных тире (используй средние тире)
+				- без кавычек
+				- без вводных фраз и пояснений
+				- естественный, живой, человеческий стиль. Как пример - тексты в соцсетях aviasales.
+				- не более 250 символов в описании`
+			: `Предложи интересное место для посещения в России. Нужно что-то оригинальное, не банальное.
+
+				Нужен короткий ответ для карточки на сайте.
+
+				Требования:
+				- без markdown
+				- без звёздочек
+				- без списков
+				- без длинных тире (используй средние тире)
+				- без кавычек
+				- без вводных фраз и пояснений
+				- естественный, живой, человеческий стиль. Как пример - тексты в соцсетях aviasales.
+				- не более 250 символов в описании`;
+
+		const response = await axios.post(
+			"https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
+			{
+				model: "GigaChat-Pro",
+				messages: [{ role: "user", content: prompt }]
+			},
+			{
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+					"Content-Type": "application/json"
+				},
+				httpsAgent
+			}
+		);
+
+		const result = response.data.choices?.[0]?.message?.content;
+		res.json({ place: result ?? "Не удалось получить ответ" });
+	} catch (e: any) {
+		console.error("GigaChat error:", e?.response?.data ?? e.message);
+		res.status(500).json({ error: "Ошибка при обращении к GigaChat" });
+	}
+};
+
 export const suggestPlaces = async (_req: any, res: any) => {
 	try {
 		const accessToken = await getAccessToken(); // получаем токен

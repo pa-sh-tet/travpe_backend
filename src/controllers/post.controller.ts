@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../utils/prisma";
 
 interface CreatePostBody {
 	content: string;
@@ -56,6 +54,18 @@ export const getPosts = async (req: Request, res: Response) => {
 						id: true,
 						username: true,
 						avatar: true
+					}
+				},
+				_count: {
+					select: { comments: true }
+				},
+				comments: {
+					take: 3,
+					orderBy: { createdAt: "desc" },
+					include: {
+						user: {
+							select: { id: true, username: true, avatar: true }
+						}
 					}
 				}
 			},
